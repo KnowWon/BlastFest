@@ -5,6 +5,9 @@ import wave
 
 def get_audio_levels(filename):
     try:
+        # Wait for the audio capture to complete
+        time.sleep(1)  # Adjust sleep time as needed
+
         # Convert the file to a standard PCM format using sox
         converted_filename = "converted_input.wav"
         subprocess.run(['sox', filename, '-b', '16', '-t', 'wav', converted_filename], check=True)
