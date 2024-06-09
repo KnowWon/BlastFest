@@ -5,8 +5,12 @@ import wave
 
 def get_audio_levels(filename):
     try:
-        # Read the recorded WAV file
-        with wave.open(filename, 'rb') as wf:
+        # Convert the file to a standard PCM format using sox
+        converted_filename = "converted_input.wav"
+        subprocess.run(['sox', filename, '-b', '16', converted_filename], check=True)
+        
+        # Read the converted WAV file
+        with wave.open(converted_filename, 'rb') as wf:
             num_channels = wf.getnchannels()
             sample_width = wf.getsampwidth()
             frame_rate = wf.getframerate()
