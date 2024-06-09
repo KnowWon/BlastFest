@@ -23,6 +23,16 @@ echo "Starting JACK server..."
 $start_jack
 echo "JACK server started."
 
+# Wait for the jackd to start
+sleep 5
+
+echo "Running Capture Audio Levels Python Script"
+python3 $capture_audio_levels >> $log_dir/capture_audio_levels.log 2>&1 &
+echo "Capture Audio Levels Python script running in the background."
+
+# Wait for the audio capture to start
+sleep 5
+
 # Stop existing instances of app.py
 echo "Stopping existing instances of app.py..."
 sudo pkill -f "python3 $app"
@@ -33,9 +43,6 @@ echo "Running App Python script..."
 python3 $app >> $log_dir/app.log 2>&1 &
 echo "App Python script running in the background."
 
-# Wait for the Flask server to start
-sleep 5
 
-echo "Running Capture Audio Levels Python Script"
-python3 $capture_audio_levels >> $log_dir/capture_audio_levels.log 2>&1 &
-echo "Capture Audio Levels Python script running in the background."
+
+
