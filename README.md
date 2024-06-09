@@ -22,7 +22,7 @@ There is 1 Mic on the Kick Drum and 1 on the Snare drum, these are going into In
 A program configures Jackd and Alsa at start up so that these Inputs are connected to Left and Right Outputs, This part is currently working.
 
 Stage 2:
-Get a program to detect when a level has been detected on each microphone
+Get a program to detect when a level has been detected on each microphone. done
 
 Stage 3:
 Next I want to show the Outputs on a webpage where a trigger level can be set, this will be the calibration page and mean that the trigger levels can be dynamically adjusted without having to manually adjust the levels on the audio interface.
