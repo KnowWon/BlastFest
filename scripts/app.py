@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template
+from flask import Flask, render_template, jsonify
 import subprocess
 import time
 import numpy as np
