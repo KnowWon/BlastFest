@@ -7,7 +7,7 @@ def get_audio_levels(filename):
     try:
         # Convert the file to a standard PCM format using sox
         converted_filename = "converted_input.wav"
-        subprocess.run(['sox', filename, '-b', '16', '-t', 'wav', converted_filename], check=True)
+        subprocess.run(['sox', filename, '-b', '16', '-r', '44100', '-e', 'signed-integer', '-c', '2', '-t', 'wav', converted_filename], check=True)
         
         # Read the converted WAV file
         with wave.open(converted_filename, 'rb') as wf:
