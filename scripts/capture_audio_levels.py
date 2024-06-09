@@ -7,7 +7,7 @@ def get_audio_levels(filename):
     try:
         # Convert the file to a standard PCM format using sox
         converted_filename = "converted_input.wav"
-        subprocess.run(['sox', filename, '-b', '16', '-r', '44100', '-e', 'signed-integer', '-c', '2', '-t', 'wav', converted_filename], check=True)
+        subprocess.run(['sox', filename, '-b', '16', '-t', 'wav', converted_filename], check=True)
         
         # Read the converted WAV file
         with wave.open(converted_filename, 'rb') as wf:
@@ -37,7 +37,7 @@ def main():
         print("Monitoring audio levels. Press Ctrl+C to stop.")
         while True:
             # Capture audio using jack_capture
-            subprocess.run(['jack_capture', '-d', '1', '-c', '2', 'input2.wav'])
+            subprocess.run(['jack_capture', '-d', '1', '-c', '2', 'input2.wav'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
             # Get audio levels from the captured file
             peak_left, peak_right = get_audio_levels('input2.wav')
