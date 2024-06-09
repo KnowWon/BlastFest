@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 import subprocess
 import time
 import numpy as np
@@ -8,10 +8,13 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('levels2.html')
 
 def get_audio_levels(filename):
     try:
+        # Wait for the audio capture to complete
+        time.sleep(1)  # Adjust sleep time as needed
+
         # Convert the file to a standard PCM format using sox
         converted_filename = "converted_input.wav"
         subprocess.run(['sox', filename, '-b', '16', '-t', 'wav', converted_filename], check=True)
@@ -48,11 +51,11 @@ def audio_levels():
         # Get audio levels from the captured file
         peak_left, peak_right = get_audio_levels('input2.wav')
         if peak_left is not None and peak_right is not None:
-            return {'peak_left': peak_left, 'peak_right': peak_right}
+            return jsonify({'peak_left': peak_left, 'peak_right': peak_right})
         else:
-            return {'error': 'Failed to get audio levels'}
+            return jsonify({'error': 'Failed to get audio levels'})
     except Exception as e:
-        return {'error': f"Error: {e}"}
+        return jsonify({'error': f"Error: {e}"})
 
 def update_audio_levels():
     while True:
