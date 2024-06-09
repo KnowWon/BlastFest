@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Levels</title>
+</head>
+<body>
+    <h1>Audio Levels</h1>
+    <p>Peak Left: <span id="peak_left"></span></p>
+    <p>Peak Right: <span id="peak_right"></span></p>
+    <script>
+        function fetchAudioLevels() {
+            fetch('/audio_levels')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('peak_left').innerText = data.peak_left;
+                    document.getElementById('peak_right').innerText = data.peak_right;
+                })
+                .catch(error => console.error('Error:', error));
+        }
+        setInterval(fetchAudioLevels, 1000);
+        fetchAudioLevels();  // Initial fetch
+    </script>
+</body>
+</html>
