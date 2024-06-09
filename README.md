@@ -37,3 +37,6 @@ Multiple bands, which can be switched between by controller tablet.
 Stage 9: 
 High scores displayed inbetween bands
 
+Programs run:
+/scripts/start.sh in Cronjob at reboot
+
