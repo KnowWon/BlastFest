@@ -66,4 +66,4 @@ def update_audio_levels():
 if __name__ == "__main__":
     import threading
     threading.Thread(target=update_audio_levels).start()
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
