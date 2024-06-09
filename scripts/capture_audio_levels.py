@@ -5,9 +5,6 @@ import wave
 
 def get_audio_levels(filename):
     try:
-        # Wait for the audio capture to complete
-        time.sleep(1)  # Adjust sleep time as needed
-
         # Convert the file to a standard PCM format using sox
         converted_filename = "converted_input.wav"
         subprocess.run(['sox', filename, '-b', '16', '-t', 'wav', converted_filename], check=True)
@@ -29,6 +26,8 @@ def get_audio_levels(filename):
         # Compute peak levels for each channel
         peak_left = np.max(np.abs(audio_array[::2]))
         peak_right = np.max(np.abs(audio_array[1::2]))
+
+        print(f"Captured audio levels - Peak Left: {peak_left}, Peak Right: {peak_right}")
 
         return peak_left, peak_right
     except Exception as e:
