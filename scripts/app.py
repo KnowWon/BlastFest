@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, jsonify, render_template
 import subprocess
 import time
 import numpy as np
@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return render_template('levels2.html')
+    return render_template('levels3.html')
 
 def get_audio_levels(filename):
     try:
@@ -51,7 +51,7 @@ def audio_levels():
         # Get audio levels from the captured file
         peak_left, peak_right = get_audio_levels('input2.wav')
         if peak_left is not None and peak_right is not None:
-            return jsonify({'peak_left': peak_left, 'peak_right': peak_right})
+            return jsonify({'peak_left': int(peak_left), 'peak_right': int(peak_right)})  # Convert to int for JSON serialization
         else:
             return jsonify({'error': 'Failed to get audio levels'})
     except Exception as e:
