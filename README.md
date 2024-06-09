@@ -38,5 +38,6 @@ Stage 9:
 High scores displayed inbetween bands
 
 Programs run:
+/scripts/purge.sh in Cronjopb at reboot
 /scripts/start.sh in Cronjob at reboot
 
