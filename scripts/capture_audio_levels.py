@@ -38,7 +38,7 @@ def extract_level(line):
     return 0
 
 def send_levels_to_server(levels):
-    url = 'http://127.0.0.1:5001/upload_levels'  # Flask app running on port 5001
+    url = 'http://127.0.0.1:5000/upload_levels'  # Flask app running on port 5000
     data = {'input1': levels['input1'], 'input2': levels['input2']}
     try:
         response = requests.post(url, json=data)
