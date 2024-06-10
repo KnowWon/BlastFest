@@ -1,55 +1,62 @@
 import subprocess
+import requests
 import time
-import numpy as np
-import wave
 
-def get_audio_levels(filename):
+def connect_jack_ports():
+    # Connect jack_capture input1 and input2 to system capture channels
+    subprocess.run(['jack_connect', 'system:capture_1', 'jack_capture:input1'])
+    subprocess.run(['jack_connect', 'system:capture_2', 'jack_capture:input2'])
+
+def get_audio_levels():
+    # Command to capture audio levels from jack_capture for input1 and input2 channels
+    result = subprocess.run(['jack_capture', '-d', '1', '-c', '2', 'temp.wav'], capture_output=True, text=True)
+    levels = parse_output(result.stdout)
+    return levels
+
+def parse_output(output):
+    # Implement your logic to parse the output and extract audio levels
+    # For example, parse the stdout for levels information and return a dictionary
+    levels = {'input1': 0, 'input2': 0}  # Initialize levels
+    # Parse output and update levels dictionary
+    # Example logic for parsing (adjust according to actual output format):
+    for line in output.split('\n'):
+        if 'input1' in line:
+            levels['input1'] = extract_level(line)
+        elif 'input2' in line:
+            levels['input2'] = extract_level(line)
+    return levels
+
+def extract_level(line):
+    # Extract level from the line
+    # Placeholder logic - update according to actual output format
+    parts = line.split(':')
+    if len(parts) > 1:
+        try:
+            return int(parts[1].strip())
+        except ValueError:
+            return 0
+    return 0
+
+def send_levels_to_server(levels):
+    url = 'http://127.0.0.1:5001/upload_levels'  # Flask app running on port 5001
+    data = {'input1': levels['input1'], 'input2': levels['input2']}
     try:
-        # Convert the file to a standard PCM format using sox
-        converted_filename = "converted_input.wav"
-        subprocess.run(['sox', filename, '-b', '16', '-t', 'wav', converted_filename], check=True)
-        
-        # Read the converted WAV file
-        with wave.open(converted_filename, 'rb') as wf:
-            num_channels = wf.getnchannels()
-            sample_width = wf.getsampwidth()
-            frame_rate = wf.getframerate()
-            num_frames = wf.getnframes()
-            audio_data = wf.readframes(num_frames)
+        response = requests.post(url, json=data)
+        response.raise_for_status()  # Raise an exception for HTTP errors
+        return response.status_code
+    except requests.exceptions.RequestException as e:
+        print(f"Error sending levels to server: {e}")
+        return None
 
-        # Convert audio data to numpy array
-        audio_array = np.frombuffer(audio_data, dtype=np.int16)
+# Connect the jack ports
+connect_jack_ports()
 
-        if audio_array.size == 0:
-            raise ValueError("Empty audio array")
-
-        # Compute peak levels for each channel
-        peak_left = np.max(np.abs(audio_array[::2]))
-        peak_right = np.max(np.abs(audio_array[1::2]))
-
-        print(f"Captured audio levels - Peak Left: {peak_left}, Peak Right: {peak_right}")
-
-        return peak_left, peak_right
-    except Exception as e:
-        print(f"Error: {e}")
-        return None, None
-
-def main():
-    try:
-        print("Monitoring audio levels. Press Ctrl+C to stop.")
-        while True:
-            # Capture audio using jack_capture
-            subprocess.run(['jack_capture', '-d', '1', '-c', '2', 'input2.wav'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
-            # Get audio levels from the captured file
-            peak_left, peak_right = get_audio_levels('input2.wav')
-            if peak_left is not None and peak_right is not None:
-                print(f"Peak Left: {peak_left}, Peak Right: {peak_right}")
-
-            # Sleep for a second before the next capture
-            time.sleep(1)
-    except KeyboardInterrupt:
-        print("Stopping audio level monitoring.")
-
-if __name__ == "__main__":
-    main()
+while True:
+    levels = get_audio_levels()
+    print(f"Captured levels: {levels}")  # Debug print
+    status = send_levels_to_server(levels)
+    if status == 200:
+        print("Successfully sent levels to server")
+    else:
+        print("Failed to send levels to server")
+    time.sleep(1)  # Adjust the sleep time as needed
