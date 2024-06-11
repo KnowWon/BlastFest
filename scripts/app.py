@@ -1,8 +1,9 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify
 import subprocess
 import time
 import numpy as np
 import wave
+import os
 
 app = Flask(__name__)
 
@@ -12,10 +13,13 @@ def index():
 
 def get_audio_levels(filename):
     try:
+        # Wait for the audio capture to complete
+        time.sleep(1)  # Adjust sleep time as needed
+
         # Convert the file to a standard PCM format using sox
         converted_filename = "converted_input.wav"
         subprocess.run(['sox', filename, '-b', '16', '-t', 'wav', converted_filename], check=True)
-
+        
         # Read the converted WAV file
         with wave.open(converted_filename, 'rb') as wf:
             num_channels = wf.getnchannels()
@@ -38,6 +42,10 @@ def get_audio_levels(filename):
     except Exception as e:
         print(f"Error: {e}")
         return None, None
+    finally:
+        # Clean up temporary files
+        if os.path.exists(converted_filename):
+            os.remove(converted_filename)
 
 @app.route('/audio_levels')
 def audio_levels():
@@ -53,16 +61,6 @@ def audio_levels():
             return jsonify({'error': 'Failed to get audio levels'})
     except Exception as e:
         return jsonify({'error': f"Error: {e}"})
-
-@app.route('/upload_levels', methods=['POST'])
-def upload_levels():
-    data = request.get_json()
-    if 'input1' in data and 'input2' in data:
-        # Process and store the levels data as needed
-        print(f"Received levels: {data}")
-        return jsonify({"status": "success"}), 200
-    else:
-        return jsonify({"error": "Invalid data"}), 400
 
 def update_audio_levels():
     while True:
