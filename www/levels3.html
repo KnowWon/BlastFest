@@ -4,23 +4,68 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Audio Levels</title>
+    <style>
+        .meter {
+            width: 100%;
+            height: 30px;
+            background-color: #ccc;
+        }
+        .level {
+            height: 100%;
+            background-color: green;
+            text-align: right;
+            padding-right: 5px;
+            box-sizing: border-box;
+            color: white;
+        }
+    </style>
 </head>
 <body>
     <h1>Audio Levels</h1>
-    <p>Peak Left: <span id="peak_left"></span></p>
-    <p>Peak Right: <span id="peak_right"></span></p>
+    <div>
+        <h2>Left Channel</h2>
+        <div class="meter">
+            <div id="left-level" class="level">0</div>
+        </div>
+    </div>
+    <div>
+        <h2>Right Channel</h2>
+        <div class="meter">
+            <div id="right-level" class="level">0</div>
+        </div>
+    </div>
+
     <script>
         function fetchAudioLevels() {
-            fetch('/audio_levels')
+            fetch('http://192.168.2.15:5000/audio_levels')
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('peak_left').innerText = data.peak_left;
-                    document.getElementById('peak_right').innerText = data.peak_right;
+                    if (data.peak_left !== undefined && data.peak_right !== undefined) {
+                        updateLevels(data.peak_left, data.peak_right);
+                    } else {
+                        console.error("Error fetching audio levels:", data.error);
+                    }
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => {
+                    console.error('Error fetching audio levels:', error);
+                });
         }
-        setInterval(fetchAudioLevels, 1000);
-        fetchAudioLevels();  // Initial fetch
+
+        function updateLevels(left, right) {
+            const leftLevelElement = document.getElementById('left-level');
+            const rightLevelElement = document.getElementById('right-level');
+
+            const leftPercentage = (left / 1000) * 100;
+            const rightPercentage = (right / 1000) * 100;
+
+            leftLevelElement.style.width = leftPercentage + '%';
+            leftLevelElement.textContent = left;
+
+            rightLevelElement.style.width = rightPercentage + '%';
+            rightLevelElement.textContent = right;
+        }
+
+        setInterval(fetchAudioLevels, 1000);  // Fetch audio levels every second
     </script>
 </body>
 </html>
