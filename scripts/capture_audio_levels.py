@@ -15,9 +15,7 @@ def get_audio_levels():
 
 def parse_output(output):
     # Implement your logic to parse the output and extract audio levels
-    # For example, parse the stdout for levels information and return a dictionary
     levels = {'input1': 0, 'input2': 0}  # Initialize levels
-    # Parse output and update levels dictionary
     # Example logic for parsing (adjust according to actual output format):
     for line in output.split('\n'):
         if 'input1' in line:
@@ -28,7 +26,6 @@ def parse_output(output):
 
 def extract_level(line):
     # Extract level from the line
-    # Placeholder logic - update according to actual output format
     parts = line.split(':')
     if len(parts) > 1:
         try:
